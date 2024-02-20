@@ -58,6 +58,7 @@ ui <- fluidPage(
 )
 
 
+
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
@@ -66,21 +67,24 @@ server <- function(input, output) {
   output$estTable <- renderTable({
     data |>
       filter(Annuals %in% input$products) |>
-      mutate("Units (ea) Required" = input$area * `Planting Density (ea. per ft2)`,
+      dplyr::mutate("Units (ea) Required" = input$area * `Planting Density (ea. per ft2)`,
              "Units Rounded up to Full Tray" =  (round_any(round_any(`Units (ea) Required`,1) / `Each per Tray`,1,ceiling) * `Each per Tray`) |> as.integer(),
              "Price Estimate per Full Tray" = `Units Rounded up to Full Tray` * Price,
              "Estimated Freight (7%)" = `Price Estimate per Full Tray` * freight,
              "Estimated Total" = `Price Estimate per Full Tray` + `Estimated Freight (7%)`) |>
-      mutate(across(all_of(`Units (ea) Required`,`Units Rounded up to Full Tray`), format),
-             across(all_of(`Price Estimate per Full Tray`,`Estimated Freight (7%)`,`Estimated Total`),
-                    function(x) {x |> as.currency(currency_symbol = "$", as_symbol = TRUE) |> format(currency_symbol = "$", as_symbol = TRUE)})) |>
-      select(!c(`Each per Tray`, matches("Planting Density"), Price)) |>
+      dplyr::mutate(across(all_of(c("Units (ea) Required","Units Rounded up to Full Tray")),
+                    function(x) {format(x) |> str_remove("(?<=[:punct:])0*$")}),
+             across(all_of(c("Price Estimate per Full Tray","Estimated Freight (7%)","Estimated Total")),
+                    function(x) {x |>
+                        as.currency(currency_symbol = "$", as_symbol = TRUE) |>
+                        format(currency_symbol = "$", as_symbol = TRUE)})) |>
+      dplyr::select(!c(`Each per Tray`, matches("Planting Density"), Price)) |>
       pivot_longer(!Annuals) |>
       pivot_wider(names_from = Annuals) |>
       column_to_rownames("name")
   },spacing = "l", rownames = TRUE)
 
-    output$disclaimer <- renderText({"This tool is provided to help choose between product options for estimating purposes only."})
+    output$disclaimer <- renderText({"This tool is provided to help choose between product options and is for estimation purposes only."})
 }
 
 # Run the application
