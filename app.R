@@ -14,7 +14,8 @@ sapply(pacs, require, character = TRUE)
 # Retrieve data
 price_level <- 0
 freight <- 0.07
-data_path <- "Greenstreet Growers/TeamSite - Documents/Shared/Production Greenstreet/Production Finished/Spring 2024/pricing/4and6inchPricesSp2024.xlsx" |> fs::path_home()
+# data_path <- "Greenstreet Growers/TeamSite - Documents/Shared/Production Greenstreet/Production Finished/Spring 2024/pricing/4and6inchPricesSp2024.xlsx" |> fs::path_home()
+data_path < "4and6inchPricesSp2024.xlsx"
 data <- data_path |>
   readxl::read_xlsx() |>
   dplyr::select(Annuals, `Each per Tray`, matches("Planting Density"), matches(paste0("Price[:space:]?", if_else(price_level %in% 1:6, price_level|> as.character(), ""),"$"))) |>
