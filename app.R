@@ -18,7 +18,7 @@ freight <- 0.07
 data_path <- "4and6inchPricesSp2024.xlsx"
 data <- data_path |>
   readxl::read_xlsx() |>
-  dplyr::select(Annuals, `Each per Tray`, matches("Planting Density"), matches(paste0("Price[:space:]?", if_else(price_level %in% 1:6, price_level|> as.character(), ""),"$"))) |>
+  dplyr::select(Annuals, `Each per Tray`, matches("Planting Density"), matches(paste0("Price", if_else(price_level %in% 1:6, paste0(".",price_level), "$")))) |>
   dplyr::rename(Price = matches("Price"))
 
 
@@ -35,7 +35,7 @@ ui <- fluidPage(
             numericInput("area",
                         "Enter your bed area",
                         min = 0,
-                        value = 100),
+                        value = ""),
             # selectInput("units",
             #             "Choose area units",
             #             measurements::conv_unit_options$area,
