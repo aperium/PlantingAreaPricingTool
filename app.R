@@ -13,21 +13,29 @@ library(shiny)
 ui <- fluidPage(
 
     # Application title
-    titlePanel("Old Faithful Geyser Data"),
+    titlePanel("Planting Area Pricing Tool"),
 
-    # Sidebar with a slider input for number of bins 
+    # Sidebar with a slider input for number of bins
     sidebarLayout(
         sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
+            numericInput("area",
+                        "Enter your bed area",
+                        min = 0,
+                        value = 0),
+            selectInput("units",
+                        "Choose area units",
+                        measurements::conv_unit_options$area,
+                        selected = "ft2"),
+            selectInput("products",
+                        "Select products to compare",
+                        c("a","b","c"),
+                        multiple = TRUE)
+
         ),
 
         # Show a plot of the generated distribution
         mainPanel(
-           plotOutput("distPlot")
+           textOutput("outText")
         )
     )
 )
@@ -35,17 +43,13 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
+    output$outText <- renderText({
+        area <- input$area
 
         # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white',
-             xlab = 'Waiting time to next eruption (in mins)',
-             main = 'Histogram of waiting times')
+        area
     })
 }
 
-# Run the application 
+# Run the application
 shinyApp(ui = ui, server = server)
