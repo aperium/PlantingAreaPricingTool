@@ -33,7 +33,7 @@ ui <- fluidPage(
     sidebarLayout(
         sidebarPanel(
             numericInput("area",
-                        "Enter your bed area",
+                        "Enter your bed area in sqft",
                         min = 0,
                         value = ""),
             # selectInput("units",
