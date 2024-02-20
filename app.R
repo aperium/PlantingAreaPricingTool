@@ -8,7 +8,7 @@
 #
 
 # Load packages
-pacs <- c("shiny", "shinyjs", "fs", "measurements", "readxl", "dplyr", "tidyr", "cleaner", "tibble")
+pacs <- c("shiny", "shinyjs", "fs", "measurements", "readxl", "dplyr", "tidyr", "cleaner", "tibble", "stringr")
 sapply(pacs, require, character = TRUE)
 
 # Retrieve data
@@ -68,14 +68,13 @@ server <- function(input, output) {
     data |>
       filter(Annuals %in% input$products) |>
       dplyr::mutate("Units (ea) Required" = input$area * `Planting Density (ea. per ft2)`,
-             "Units Rounded up to Full Tray" =  (round_any(round_any(`Units (ea) Required`,1) / `Each per Tray`,1,ceiling) * `Each per Tray`) |> as.integer(),
+             "Units Rounded up to Full Tray" =  (plyr::round_any(plyr::round_any(`Units (ea) Required`,1) / `Each per Tray`,1,ceiling) * `Each per Tray`) |> as.integer(),
              "Price Estimate per Full Tray" = `Units Rounded up to Full Tray` * Price,
              "Estimated Freight (7%)" = `Price Estimate per Full Tray` * freight,
              "Estimated Total" = `Price Estimate per Full Tray` + `Estimated Freight (7%)`) |>
-      dplyr::mutate(across(all_of(c("Units (ea) Required","Units Rounded up to Full Tray")),
-                    function(x) {format(x) |> str_remove("(?<=[:punct:])0*$")}),
-             across(all_of(c("Price Estimate per Full Tray","Estimated Freight (7%)","Estimated Total")),
-                    function(x) {x |>
+      dplyr::mutate(across(all_of(c("Units (ea) Required","Units Rounded up to Full Tray")), function(x) {format(x) |> str_remove("(?<=[:punct:])0*$")}),
+                    across(all_of(c("Price Estimate per Full Tray","Estimated Freight (7%)","Estimated Total")),
+                      function(x) {x |>
                         as.currency(currency_symbol = "$", as_symbol = TRUE) |>
                         format(currency_symbol = "$", as_symbol = TRUE)})) |>
       dplyr::select(!c(`Each per Tray`, matches("Planting Density"), Price)) |>
