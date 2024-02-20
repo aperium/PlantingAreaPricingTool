@@ -8,7 +8,7 @@
 #
 
 # Load packages
-pacs <- c("shiny", "shinyjs", "fs", "measurements", "dplyr", "tidyr", "tibble", "stringr")
+pacs <- c("shiny", "shinyjs", "dplyr", "tidyr")
 sapply(pacs, require, character = TRUE)
 
 # Retrieve data
@@ -17,9 +17,9 @@ freight <- 0.07
 data_path <- "Greenstreet Growers/TeamSite - Documents/Shared/Production Greenstreet/Production Finished/Spring 2024/pricing/4and6inchPricesSp2024.xlsx" |> fs::path_home()
 data <- data_path |>
   readxl::read_xlsx() |>
-  select(Annuals, `Each per Tray`, matches("Planting Density"), matches(paste0("Price[:space:]?", if_else(price_level %in% 1:6, price_level|> as.character(), ""),"$"))) |>
-  dplyr::rename(Price = matches("Price")) ## |>
-  # dplyr::mutate(Price = Price |> cleaner::as.currency(currency_symbol = "$", as_symbol = TRUE))
+  dplyr::select(Annuals, `Each per Tray`, matches("Planting Density"), matches(paste0("Price[:space:]?", if_else(price_level %in% 1:6, price_level|> as.character(), ""),"$"))) |>
+  dplyr::rename(Price = matches("Price"))
+
 
 
 # Define UI for application that draws a histogram
@@ -66,7 +66,7 @@ server <- function(input, output) {
 
   output$estTable <- renderTable({
     data |>
-      filter(Annuals %in% input$products) |>
+      dplyr::filter(Annuals %in% input$products) |>
       dplyr::mutate("Units (ea) Required" = input$area * `Planting Density (ea. per ft2)`,
              "Units Rounded up to Full Tray" =  (plyr::round_any(plyr::round_any(`Units (ea) Required`,1) / `Each per Tray`,1,ceiling) * `Each per Tray`) |> as.integer(),
              "Price Estimate per Full Tray" = `Units Rounded up to Full Tray` * Price,
@@ -80,7 +80,7 @@ server <- function(input, output) {
       dplyr::select(!c(`Each per Tray`, matches("Planting Density"), Price)) |>
       pivot_longer(!Annuals) |>
       pivot_wider(names_from = Annuals) |>
-      column_to_rownames("name")
+      tibble::column_to_rownames("name")
   },spacing = "l", rownames = TRUE)
 
     output$disclaimer <- renderText({"This tool is provided to help choose between product options and is for estimation purposes only."})
