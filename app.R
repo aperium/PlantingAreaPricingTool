@@ -36,7 +36,7 @@ ui <- fluidPage(
             numericInput("area",
                         "Enter your bed area",
                         min = 0,
-                        value = ""),
+                        value = 100),
             selectInput("units",
                         "Choose area units",
                         measurements::conv_unit_options$area,
@@ -97,12 +97,9 @@ server <- function(input, output) {
              "Price Estimate per Full Tray" = `Units Rounded up to Full Tray` * Price,
              "Estimated Freight (7%)" = `Price Estimate per Full Tray` * freight,
              "Estimated Total" = `Price Estimate per Full Tray` + `Estimated Freight (7%)`) |>
-      mutate(across(any_of(`Units (ea) Required`),
-                    function(x) prettyNum(x, drop0trailing = TRUE, zero.print = FALSE)),
-             across(any_of(`Units Rounded up to Full Tray`),
-                    function(x) prettyNum(x, drop0trailing = TRUE, zero.print = FALSE)),
-             across(any_of(`Price Estimate per Full Tray`,`Estimated Freight (7%)`,`Estimated Total`),
-                    function(x) {x |> as.currency(currency_symbol = "$", as_symbol = TRUE) |> as.character()})) |>
+      mutate(across(all_of(`Units (ea) Required`,`Units Rounded up to Full Tray`), format),
+             across(all_of(`Price Estimate per Full Tray`,`Estimated Freight (7%)`,`Estimated Total`),
+                    function(x) {x |> as.currency(currency_symbol = "$", as_symbol = TRUE) |> format(currency_symbol = "$", as_symbol = TRUE)})) |>
       select(!c(`Each per Tray`, matches("Planting Density"), Price)) |>
       pivot_longer(!Annuals) |>
       pivot_wider(names_from = Annuals) |>
