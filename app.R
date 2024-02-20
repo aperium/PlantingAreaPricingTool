@@ -8,7 +8,7 @@
 #
 
 # Load packages
-pacs <- c("shiny", "shinyjs", "fs", "measurements", "readxl", "dplyr", "tidyr", "cleaner", "tibble", "stringr")
+pacs <- c("shiny", "shinyjs", "fs", "measurements", "dplyr", "tidyr", "tibble", "stringr")
 sapply(pacs, require, character = TRUE)
 
 # Retrieve data
@@ -16,7 +16,7 @@ price_level <- 0
 freight <- 0.07
 data_path <- "Greenstreet Growers/TeamSite - Documents/Shared/Production Greenstreet/Production Finished/Spring 2024/pricing/4and6inchPricesSp2024.xlsx" |> fs::path_home()
 data <- data_path |>
-  read_xlsx() |>
+  readxl::read_xlsx() |>
   select(Annuals, `Each per Tray`, matches("Planting Density"), matches(paste0("Price[:space:]?", if_else(price_level %in% 1:6, price_level|> as.character(), ""),"$"))) |>
   dplyr::rename(Price = matches("Price")) ## |>
   # dplyr::mutate(Price = Price |> cleaner::as.currency(currency_symbol = "$", as_symbol = TRUE))
@@ -72,10 +72,10 @@ server <- function(input, output) {
              "Price Estimate per Full Tray" = `Units Rounded up to Full Tray` * Price,
              "Estimated Freight (7%)" = `Price Estimate per Full Tray` * freight,
              "Estimated Total" = `Price Estimate per Full Tray` + `Estimated Freight (7%)`) |>
-      dplyr::mutate(across(all_of(c("Units (ea) Required","Units Rounded up to Full Tray")), function(x) {format(x) |> str_remove("(?<=[:punct:])0*$")}),
+      dplyr::mutate(across(all_of(c("Units (ea) Required","Units Rounded up to Full Tray")), function(x) {format(x) |> stringr::str_remove("(?<=[:punct:])0*$")}),
                     across(all_of(c("Price Estimate per Full Tray","Estimated Freight (7%)","Estimated Total")),
                       function(x) {x |>
-                        as.currency(currency_symbol = "$", as_symbol = TRUE) |>
+                          cleaner::as.currency(currency_symbol = "$", as_symbol = TRUE) |>
                         format(currency_symbol = "$", as_symbol = TRUE)})) |>
       dplyr::select(!c(`Each per Tray`, matches("Planting Density"), Price)) |>
       pivot_longer(!Annuals) |>
