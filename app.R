@@ -8,7 +8,7 @@
 #
 
 # Load packages
-pacs <- c("shiny", "shinyjs", "fs", "measurements", "readxl", "dplyr", "tidyr", "plyr", "cleaner", "data.table", "tibble")
+pacs <- c("shiny", "shinyjs", "fs", "measurements", "readxl", "dplyr", "tidyr", "cleaner", "tibble")
 sapply(pacs, require, character = TRUE)
 
 # Retrieve data
