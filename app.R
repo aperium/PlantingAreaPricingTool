@@ -37,10 +37,10 @@ ui <- fluidPage(
                         "Enter your bed area",
                         min = 0,
                         value = 100),
-            selectInput("units",
-                        "Choose area units",
-                        measurements::conv_unit_options$area,
-                        selected = "ft2"),
+            # selectInput("units",
+            #             "Choose area units",
+            #             measurements::conv_unit_options$area,
+            #             selected = "ft2"),
             selectInput("products",
                         "Select products to compare",
                         data$Annuals,
@@ -57,34 +57,8 @@ ui <- fluidPage(
     )
 )
 
-# input_products <- data$Annuals[1:2]
-# input_area <- 100
-# tmp <- data |>
-#   filter(Annuals %in% input_products) |>
-#   mutate("Units (ea) Required" = input_area * `Planting Density (ea. per ft2)`,
-#          "Units Rounded up to Full Tray" =  round_any(round_any(`Units (ea) Required`,1) / `Each per Tray`,1,ceiling) * `Each per Tray`,
-#          "Price Estimate per Full Tray" = `Units Rounded up to Full Tray` * Price,
-#          "Estimated Freight (7%)" = `Price Estimate per Full Tray` * freight,
-#          "Estimated Total" = `Price Estimate per Full Tray` + `Estimated Freight (7%)`) |>
-#   data.table::transpose(make.names = "Annuals") |>
-#   remove_rownames() |>
-#   column_to_rownames("description")
-# data |>
-#   filter(Annuals %in% input_products) |>
-#   mutate("Units (ea) Required" = input_area * `Planting Density (ea. per ft2)`,
-#          "Units Rounded up to Full Tray" =  (round_any(round_any(`Units (ea) Required`,1) / `Each per Tray`,1,ceiling) * `Each per Tray`) |> as.integer(),
-#          "Price Estimate per Full Tray" = `Units Rounded up to Full Tray` * Price,
-#          "Estimated Freight (7%)" = `Price Estimate per Full Tray` * freight,
-#          "Estimated Total" = `Price Estimate per Full Tray` + `Estimated Freight (7%)`) |>
-#   select(!c(`Each per Tray`, matches("Planting Density"), Price)) |>
-#   remove_rownames() |>
-#   # dplyr::mutate(across(everything(),as.character)) |>
-#   pivot_longer(!Annuals) |>
-#   pivot_wider(names_from = Annuals) |>
-#   column_to_rownames("name")
 
-
-# pivot_wider()# Define server logic required to draw a histogram
+# Define server logic required to draw a histogram
 server <- function(input, output) {
 
   output$refData <- renderTable({data})
