@@ -34,7 +34,7 @@ ui <- fluidPage(
                         selected = "ft2"),
             selectInput("products",
                         "Select products to compare",
-                        c("a","b","c"),
+                        data$Annuals,
                         multiple = TRUE)
 
         ),
