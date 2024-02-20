@@ -13,7 +13,7 @@ sapply(pacs, require, character = TRUE)
 
 # Retrieve data
 data_path <- "Greenstreet Growers/TeamSite - Documents/Shared/Production Greenstreet/Production Finished/Spring 2024/pricing/4and6inchPricesSp2024.xlsx" |> fs::path_home()
-
+data <- data_path |> read_xlsx()
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
