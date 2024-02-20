@@ -8,14 +8,14 @@
 #
 
 # Load packages
-pacs <- c("shiny", "shinyjs", "dplyr", "tidyr")
+pacs <- c("shiny", "shinyjs", "dplyr")
 sapply(pacs, require, character = TRUE)
 
 # Retrieve data
 price_level <- 0
 freight <- 0.07
 # data_path <- "Greenstreet Growers/TeamSite - Documents/Shared/Production Greenstreet/Production Finished/Spring 2024/pricing/4and6inchPricesSp2024.xlsx" |> fs::path_home()
-data_path < "4and6inchPricesSp2024.xlsx"
+data_path <- "4and6inchPricesSp2024.xlsx"
 data <- data_path |>
   readxl::read_xlsx() |>
   dplyr::select(Annuals, `Each per Tray`, matches("Planting Density"), matches(paste0("Price[:space:]?", if_else(price_level %in% 1:6, price_level|> as.character(), ""),"$"))) |>
@@ -79,8 +79,8 @@ server <- function(input, output) {
                           cleaner::as.currency(currency_symbol = "$", as_symbol = TRUE) |>
                         format(currency_symbol = "$", as_symbol = TRUE)})) |>
       dplyr::select(!c(`Each per Tray`, matches("Planting Density"), Price)) |>
-      pivot_longer(!Annuals) |>
-      pivot_wider(names_from = Annuals) |>
+      tidyr::pivot_longer(!Annuals) |>
+      tidyr::pivot_wider(names_from = Annuals) |>
       tibble::column_to_rownames("name")
   },spacing = "l", rownames = TRUE)
 
