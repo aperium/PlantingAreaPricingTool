@@ -8,7 +8,7 @@
 #
 
 # Load packages
-pacs <- c("shiny", "shinyjs", "dplyr")
+pacs <- c("shiny", "dplyr")
 sapply(pacs, require, character = TRUE)
 
 # Retrieve data
@@ -25,8 +25,6 @@ data <- data_path |>
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-  # ShinyJS is suppose to improve user experience
-  useShinyjs(),
 
     # Application title
     titlePanel("Planting Area Pricing Tool"),
