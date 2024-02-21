@@ -61,7 +61,12 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
-  output$refData <- renderTable({data})
+  output$refData <- renderTable({
+    data |>
+      dplyr::mutate(
+        Price = Price |> cleaner::as.currency(currency_symbol = "$", as_symbol = TRUE) |> format(currency_symbol = "$", as_symbol = TRUE),
+        across(all_of(c("Planting Density (ea. per ft2)", "Each per Tray")), function(x) {format(x) |> stringr::str_remove("[:punct:]0*$")}))
+    },spacing = "s")
 
   output$estTable <- renderTable({
     data |>
@@ -71,11 +76,11 @@ server <- function(input, output) {
              "Price Estimate per Full Tray" = `Units Rounded up to Full Tray` * Price,
              "Estimated Freight (7%)" = `Price Estimate per Full Tray` * freight,
              "Estimated Total" = `Price Estimate per Full Tray` + `Estimated Freight (7%)`) |>
-      dplyr::mutate(across(all_of(c("Units (ea) Required","Units Rounded up to Full Tray")), function(x) {format(x) |> stringr::str_remove("(?<=[:punct:])0*$")}),
+      dplyr::mutate(across(all_of(c("Units (ea) Required","Units Rounded up to Full Tray")), function(x) {format(x) |> stringr::str_remove("[:punct:]0*$")}),
                     across(all_of(c("Price Estimate per Full Tray","Estimated Freight (7%)","Estimated Total")),
                       function(x) {x |>
                           cleaner::as.currency(currency_symbol = "$", as_symbol = TRUE) |>
-                        format(currency_symbol = "$", as_symbol = TRUE)})) |>
+                          format(currency_symbol = "$", as_symbol = TRUE)})) |>
       dplyr::select(!c(`Each per Tray`, matches("Planting Density"), Price)) |>
       tidyr::pivot_longer(!Annuals) |>
       tidyr::pivot_wider(names_from = Annuals) |>
