@@ -35,13 +35,10 @@ logo_path <- "2022_Greenstreet_Logo_HorizontalAlign_Semi-Bold_BrownText.png" |>
 # Define UI for application that draws a histogram
 ui <- fluidPage(
 
-  # Branding
-  imageOutput("gglogo"),
-  # tags$img(src="2022_Greenstreet_Logo_HorizontalAlign_Semi-Bold_BrownText.png", alt="Greenstreet Growers Logo", height="100" ),
-
     # Application title
-    titlePanel("Bed Area Planting & Pricing Tool"),
-
+    titlePanel("Greenstreet Growers Bed Area Planting & Pricing Tool"),
+    # # Branding
+    # imageOutput("gglogo"),
     # Sidebar with a slider input for number of bins
     sidebarLayout(
         sidebarPanel(
