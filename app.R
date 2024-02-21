@@ -33,15 +33,16 @@ logo_path <- "images/2022_Greenstreet_Logo_HorizontalAlign_Semi-Bold_BrownText.p
   # png(height = 50, units = "px")
 
 
-# Define UI for application that draws a histogram
-ui <- fluidPage(
+# Define UI for application
+ui <- fluidPage( theme = bslib::bs_theme(bootswatch = "lumen"),
+
   # Branding
   imageOutput("gglogo", height = paste0(logo_height,"px")),
 
     # Application title
     titlePanel("Bed Area Planting & Pricing Tool"),
 
-    # Sidebar with a slider input for number of bins
+    # input
     sidebarLayout(
         sidebarPanel(
             # numericInput("area",
