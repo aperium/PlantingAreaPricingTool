@@ -24,13 +24,23 @@ data <- data_path |>
   dplyr::select(Annuals, `Each per Tray`, matches("Planting Density"), matches(paste0("Price", if_else(price_level %in% 1:6, paste0(".",price_level), "$")))) |>
   dplyr::rename(Price = matches("Price"))
 
+# Retrieve Logo Image
+logo_path <- "2022_Greenstreet_Logo_HorizontalAlign_Semi-Bold_BrownText.png" |>
+  fs::path_wd() |>
+  fs::path_norm()
+  ## |>
+  # png(height = 50, units = "px")
 
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
 
+  # Branding
+  imageOutput("gglogo"),
+  # tags$img(src="2022_Greenstreet_Logo_HorizontalAlign_Semi-Bold_BrownText.png", alt="Greenstreet Growers Logo", height="100" ),
+
     # Application title
-    titlePanel("Planting Area Pricing Tool"),
+    titlePanel("Bed Area Planting & Pricing Tool"),
 
     # Sidebar with a slider input for number of bins
     sidebarLayout(
@@ -65,6 +75,13 @@ ui <- fluidPage(
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
+
+  output$gglogo <- renderImage({
+    list(src = fs::path_file(logo_path),
+         contentType = 'image/png',
+         alt="Greenstreet Growers Logo",
+         height = 50)
+    }, deleteFile = FALSE)
 
   output$refData <- renderTable({
     data |>
