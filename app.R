@@ -34,7 +34,7 @@ logo_path <- "images/2022_Greenstreet_Logo_HorizontalAlign_Semi-Bold_BrownText.p
 
 
 # Define UI for application
-ui <- fluidPage( theme = bslib::bs_theme(bootswatch = "lumen"),
+ui <- fluidPage( theme = bslib::bs_theme(bootswatch = "lumen") |> bslib::bs_add_rules(".well { background-color: #f0f0f0 }"),
 
   # Branding
   imageOutput("gglogo", height = paste0(logo_height,"px")),
