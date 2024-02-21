@@ -25,6 +25,7 @@ data <- data_path |>
   dplyr::rename(Price = matches("Price"))
 
 # Retrieve Logo Image
+logo_height <- 60
 logo_path <- "images/2022_Greenstreet_Logo_HorizontalAlign_Semi-Bold_BrownText.png" |>
   fs::path_wd() |>
   normalizePath()
@@ -34,13 +35,11 @@ logo_path <- "images/2022_Greenstreet_Logo_HorizontalAlign_Semi-Bold_BrownText.p
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-
-  shiny::tags$header(
-  # # Branding
-  imageOutput("gglogo", height = "50px"),
+  # Branding
+  imageOutput("gglogo", height = paste0(logo_height,"px")),
 
     # Application title
-    titlePanel("Greenstreet Growers Bed Area Planting & Pricing Tool")),
+    titlePanel("Bed Area Planting & Pricing Tool"),
 
     # Sidebar with a slider input for number of bins
     sidebarLayout(
@@ -80,7 +79,7 @@ server <- function(input, output) {
     list(src = logo_path,
          contentType = 'image/png',
          alt="Greenstreet Growers Logo",
-         height = 50)
+         height = logo_height)
     }, deleteFile = FALSE)
 
   output$refData <- renderTable({
