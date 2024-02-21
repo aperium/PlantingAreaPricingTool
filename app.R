@@ -15,7 +15,7 @@ shinyOptions(shiny.sanitize.errors = FALSE,
              shiny.suppressMissingContextError = TRUE)
 
 # Retrieve data
-price_level <- 6
+price_level <- 0
 freight <- 0.07
 # data_path <- "Greenstreet Growers/TeamSite - Documents/Shared/Production Greenstreet/Production Finished/Spring 2024/pricing/4and6inchPricesSp2024.xlsx" |> fs::path_home()
 data_path <- "4and6inchPricesSp2024.xlsx"
