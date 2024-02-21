@@ -11,6 +11,9 @@
 pacs <- c("shiny", "dplyr", "rlang", "stringr")
 sapply(pacs, require, character = TRUE)
 
+shinyOptions(shiny.sanitize.errors = FALSE,
+             shiny.suppressMissingContextError = TRUE)
+
 # Retrieve data
 price_level <- 6
 freight <- 0.07
