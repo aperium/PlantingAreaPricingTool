@@ -18,14 +18,14 @@ shinyOptions(shiny.sanitize.errors = FALSE,
 price_level <- 6
 freight <- 0.07
 # data_path <- "Greenstreet Growers/TeamSite - Documents/Shared/Production Greenstreet/Production Finished/Spring 2024/pricing/4and6inchPricesSp2024.xlsx" |> fs::path_home()
-data_path <- "4and6inchPricesSp2024.xlsx"
+data_path <- "data/4and6inchPricesSp2024.xlsx"
 data <- data_path |>
   readxl::read_xlsx() |>
   dplyr::select(Annuals, `Each per Tray`, matches("Planting Density"), matches(paste0("Price", if_else(price_level %in% 1:6, paste0(".",price_level), "$")))) |>
   dplyr::rename(Price = matches("Price"))
 
 # Retrieve Logo Image
-logo_path <- "2022_Greenstreet_Logo_HorizontalAlign_Semi-Bold_BrownText.png" |>
+logo_path <- "images/2022_Greenstreet_Logo_HorizontalAlign_Semi-Bold_BrownText.png" |>
   fs::path_wd() |>
   fs::path_norm()
   ## |>
@@ -38,7 +38,7 @@ ui <- fluidPage(
     # Application title
     titlePanel("Greenstreet Growers Bed Area Planting & Pricing Tool"),
     # # Branding
-    # imageOutput("gglogo"),
+    imageOutput("gglogo"),
     # Sidebar with a slider input for number of bins
     sidebarLayout(
         sidebarPanel(
@@ -74,7 +74,7 @@ ui <- fluidPage(
 server <- function(input, output) {
 
   output$gglogo <- renderImage({
-    list(src = fs::path_file(logo_path),
+    list(src = fs::path_rel(logo_path),
          contentType = 'image/png',
          alt="Greenstreet Growers Logo",
          height = 50)
