@@ -8,7 +8,7 @@
 #
 
 # Load packages
-pacs <- c("shiny", "dplyr")
+pacs <- c("shiny", "dplyr", "rlang", "stringr")
 sapply(pacs, require, character = TRUE)
 
 # Retrieve data
@@ -32,10 +32,12 @@ ui <- fluidPage(
     # Sidebar with a slider input for number of bins
     sidebarLayout(
         sidebarPanel(
-            numericInput("area",
-                        "Enter your bed area in sqft",
-                        min = 0,
-                        value = ""),
+            # numericInput("area",
+            #             "Enter your bed area in sqft",
+            #             min = 0,
+            #             value = ""),
+            textInput("dimentions",
+                      "Enter your bed area (sqft) or dimentions (ft)"),
             # selectInput("units",
             #             "Choose area units",
             #             measurements::conv_unit_options$area,
@@ -68,10 +70,23 @@ server <- function(input, output) {
         across(all_of(c("Planting Density (ea. per ft2)", "Each per Tray")), function(x) {format(x) |> stringr::str_remove("[:punct:]0*$")}))
     },spacing = "s")
 
+  # "4 ft by 3 ft" |> str_to_lower() |> str_replace_all("x|(by)|(times)","*") |> str_remove_all("(?<=[:digit:][:space:]?)ft") |> rlang::parse_expr() |> eval()
+  # "2x8" |> str_remove_all("(?<=[:digit:])[:space:]?(sq)?ft\\^?2?") |> rlang::parse_expr()|>try() |> eval() |> is.numeric()
+  # "98 sqft^2" |> str_remove_all("(?<=[:digit:])[:space:]?(sq)?ft\\^?2?") |> rlang::parse_expr() |> eval()
+
   output$estTable <- renderTable({
+    # calculate area if given dimentions
+    area <- if (is.numeric(input$dimentions)) {
+      input$dimentions
+      } else if (input$dimentions |> str_remove_all("(?<=[:digit:])[:space:]?(sq)?ft(\\^?2)?|(sq)?") |> rlang::parse_expr() |>try()  |> eval() |> is.numeric()) {
+        input$dimentions |> str_remove_all("(?<=[:digit:])[:space:]?(sq)?ft(\\^?2)?|(sq)?") |> rlang::parse_expr() |> eval()
+        } else {
+        input$dimentions |> str_to_lower() |> str_replace_all("x|(by)|(times)","*") |> str_remove_all("(?<=[:digit:][:space:]?)ft") |> rlang::parse_expr() |> eval()
+        }
+
     data |>
       dplyr::filter(Annuals %in% input$products) |>
-      dplyr::mutate("Units (ea) Required" = input$area * `Planting Density (ea. per ft2)`,
+      dplyr::mutate("Units (ea) Required" = area * `Planting Density (ea. per ft2)`,
              "Units Rounded up to Full Tray" =  (plyr::round_any(plyr::round_any(`Units (ea) Required`,1) / `Each per Tray`,1,ceiling) * `Each per Tray`) |> as.integer(),
              "Price Estimate per Full Tray" = `Units Rounded up to Full Tray` * Price,
              "Estimated Freight (7%)" = `Price Estimate per Full Tray` * freight,
