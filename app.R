@@ -75,13 +75,14 @@ server <- function(input, output) {
   # "98 sqft^2" |> str_remove_all("(?<=[:digit:])[:space:]?(sq)?ft\\^?2?") |> rlang::parse_expr() |> eval()
 
   output$estTable <- renderTable({
+
     # calculate area if given dimentions
-    area <- if (is.numeric(input$dimentions)) {
-      input$dimentions
-      } else if (input$dimentions |> str_remove_all("(?<=[:digit:])[:space:]?(sq)?ft(\\^?2)?|(sq)?") |> rlang::parse_expr() |>try()  |> eval() |> is.numeric()) {
-        input$dimentions |> str_remove_all("(?<=[:digit:])[:space:]?(sq)?ft(\\^?2)?|(sq)?") |> rlang::parse_expr() |> eval()
+    input$dimentions |> str_squish() |> req()
+    area <- if (is.numeric(input$dimentions)) {input$dimentions}
+      else if (input$dimentions |> str_to_lower() |> str_remove("^[:space:]*=") |> str_remove_all("(?<=[:digit:])[:space:]?(sq)?ft(\\^?2)?|(sq)?") |> rlang::parse_expr() |>try()  |> eval() |> is.numeric()) {
+        input$dimentions |> str_to_lower() |> str_remove("^[:space:]*=") |> str_remove_all("(?<=[:digit:])[:space:]?(sq)?ft(\\^?2)?|(sq)?") |> rlang::parse_expr() |> eval()
         } else {
-        input$dimentions |> str_to_lower() |> str_replace_all("x|(by)|(times)","*") |> str_remove_all("(?<=[:digit:][:space:]?)ft") |> rlang::parse_expr() |> eval()
+        input$dimentions |> str_to_lower() |> str_remove("^[:space:]*=") |> str_replace_all("x|(by)|(times)","*") |> str_remove_all("(?<=[:digit:][:space:]?)ft") |> rlang::parse_expr() |> eval()
         }
 
     data |>
