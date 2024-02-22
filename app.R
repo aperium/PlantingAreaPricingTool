@@ -76,7 +76,7 @@ parse_area <- function(s) {
   else if (s |> str_strip_sqft() |> rlang::parse_expr() |>try()  |> eval() |> is.numeric()) {
     s |> str_strip_sqft() |> rlang::parse_expr() |> eval()
   } else {
-    s |> str_strip_ft() |> str_correct_multiply() |> rlang::parse_expr() |> eval()
+    s |> str_strip_ft() |> str_correct_multiply() |> str_correct_pi() |> rlang::parse_expr() |> eval()
   }
 }
 
