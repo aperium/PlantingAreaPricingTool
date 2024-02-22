@@ -65,8 +65,10 @@ str_correct_pi <- function(s) {
     str_to_lower()
   p <- "(?<![:digit:])3.14[:digit:]*"
   m <- s |> str_extract(p)
-  if(m |> str_equal(str_trunc(pi, str_length(m), ellipsis = ""))) str_replace_all(s, p,"pi")
-  else if(m |> str_equal(format(pi, TRUE, str_length(m)-1, scientific = FALSE))) str_replace_all(s, p,"pi")
+  l <- str_length(m)
+  if (l < 4) s
+  else if(m |> str_equal(str_trunc(pi, l, ellipsis = ""))) str_replace_all(s, p,"pi")
+  else if(m |> str_equal(format(pi, TRUE, l-1, scientific = FALSE))) str_replace_all(s, p,"pi")
   else s
 }
 
