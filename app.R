@@ -22,7 +22,6 @@ users <- users_path |>
 # Retrieve data
 price_level <- 6
 freight <- 0.07
-# data_path <- "Greenstreet Growers/TeamSite - Documents/Shared/Production Greenstreet/Production Finished/Spring 2024/pricing/4and6inchPricesSp2024.xlsx" |> fs::path_home()
 data_path <- "data/4and6inchPricesSp2024.xlsx"
 data <- data_path |>
   readxl::read_xlsx() |>
@@ -122,17 +121,17 @@ ui <- fluidPage( theme = bslib::bs_theme(bootswatch = "lumen") |> bslib::bs_add_
         mainPanel(
           uiOutput("estTitle", container = tags$h3),
           tableOutput("estTable"),
-          # textOutput("disclaimer")
         )
     ),
   tags$hr(),
-  tags$h3("Unit Prices and Recommended Planting Densities"),
-  tableOutput("refData")
+  tags$h3("Unit Prices and Recommended Planting Densities", style="text-align:center"),
+  tableOutput("refData"),
+  tags$p("© 2024 Greenstreet Growers, Inc. 2024. All Rights Reserved.", style="text-align:center")
 )
 
 
 
-# Define server logic required to draw a histogram
+# Define server logic
 server <- function(input, output) {
 
   output$gglogo <- renderImage({
@@ -147,7 +146,7 @@ server <- function(input, output) {
       dplyr::mutate(
         Price = Price |> cleaner::as.currency(currency_symbol = "$", as_symbol = TRUE) |> format(currency_symbol = "$", as_symbol = TRUE),
         across(all_of(c("Planting Density (ea. per ft2)", "Each per Tray")), function(x) {format(x) |> stringr::str_remove("[:punct:]0*$")}))
-    },spacing = "xs", align = 'c')
+    },spacing = "xs", align = 'c', html.table.attributes = "style=\"max-width:700px;margin-left:auto;margin-right:auto%;table-layout:auto;\"")
 
 
   output$estTable <- renderTable({
@@ -181,7 +180,6 @@ server <- function(input, output) {
     "Calculated Estimates"
     })
 
-    # output$disclaimer <- renderText({"This tool is provided to help choose between product options and is for estimation purposes only."})
 }
 
 # Run the application
