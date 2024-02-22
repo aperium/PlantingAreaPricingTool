@@ -32,6 +32,42 @@ logo_path <- "images/2022_Greenstreet_Logo_HorizontalAlign_Semi-Bold_BrownText.p
   ## |>
   # png(height = 50, units = "px")
 
+# A user entry parsing support function
+str_strip_sqft <- function(s) {
+  s |>
+    str_squish() |>
+    str_to_lower() |>
+    str_remove("^[:space:]*=") |>
+    str_remove_all("(?<=[:digit:])[:space:]?(sq)?ft(\\^?2)?|(sq)?")
+}
+
+# A user entry parsing support function
+str_strip_ft <- function(s) {
+  s |>
+    str_squish() |>
+    str_to_lower() |>
+    str_remove("^[:space:]*=") |>
+    str_remove_all("(?<=[:digit:][:space:]?)ft")
+}
+
+# A user entry parsing support function
+str_correct_multiply <- function(s) {
+  s |>
+    str_squish() |>
+    str_to_lower() |>
+    str_replace_all("x|(by)|(times)","*")
+}
+
+# A user entry parsing function
+parse_area <- function(s) {
+  if (is.numeric(s)) {s}
+  else if (s |> str_strip_sqft() |> rlang::parse_expr() |>try()  |> eval() |> is.numeric()) {
+    s |> str_strip_sqft() |> rlang::parse_expr() |> eval()
+  } else {
+    s |> str_strip_ft() |> str_correct_multiply() |> rlang::parse_expr() |> eval()
+  }
+}
+
 
 # Define UI for application
 ui <- fluidPage( theme = bslib::bs_theme(bootswatch = "lumen") |> bslib::bs_add_rules(".well { background-color: #ECECEC }"),
