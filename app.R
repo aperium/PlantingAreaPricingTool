@@ -60,17 +60,15 @@ str_correct_multiply <- function(s) {
 
 # A user entry parsing support function
 str_correct_pi <- function(s) {
-  str <- s |>
+  s <- s |>
     str_squish() |>
     str_to_lower()
   p <- "(?<![:digit:])3.14[:digit:]*"
   m <- s |> str_extract(p)
-  if(m |> str_equal(str_trunc(pi, str_length(m), ellipsis = ""))) str_replace_all(p,"pi")
-  else if(m |> str_equal(format(pi, TRUE, str_length(m)-1, scientific = FALSE))) str_replace_all(p,"pi")
+  if(m |> str_equal(str_trunc(pi, str_length(m), ellipsis = ""))) str_replace_all(s, p,"pi")
+  else if(m |> str_equal(format(pi, TRUE, str_length(m)-1, scientific = FALSE))) str_replace_all(s, p,"pi")
   else s
 }
-
-str_correct_pi("3.145")
 
 # A user entry parsing function
 parse_area <- function(s) {
