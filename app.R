@@ -14,6 +14,11 @@ sapply(pacs, require, character = TRUE)
 shinyOptions(shiny.sanitize.errors = FALSE,
              shiny.suppressMissingContextError = TRUE)
 
+# Retrieve users
+users_path <- "data/customers.xlsx"
+users <- users_path |>
+  readxl::read_xlsx()
+
 # Retrieve data
 price_level <- 6
 freight <- 0.07
