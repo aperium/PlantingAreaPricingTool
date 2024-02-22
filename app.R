@@ -34,8 +34,6 @@ logo_height <- 60
 logo_path <- "images/2022_Greenstreet_Logo_HorizontalAlign_Semi-Bold_BrownText.png" |>
   fs::path_wd() |>
   normalizePath()
-  ## |>
-  # png(height = 50, units = "px")
 
 # A user entry parsing support function
 str_strip_sqft <- function(s) {
@@ -114,17 +112,20 @@ ui <- fluidPage( theme = bslib::bs_theme(bootswatch = "lumen") |> bslib::bs_add_
             selectInput("products",
                         "Select products to compare",
                         data$Annuals,
-                        multiple = TRUE),
-            tableOutput("refData")
+                        multiple = TRUE)
 
         ),
+
+
 
         # Show a plot of the generated distribution
         mainPanel(
           tableOutput("estTable"),
-          textOutput("disclaimer")
+          # textOutput("disclaimer")
         )
-    )
+    ),
+  tags$h3("Unit Prices and Recommended Planting Densities"),
+  tableOutput("refData")
 )
 
 
@@ -144,15 +145,11 @@ server <- function(input, output) {
       dplyr::mutate(
         Price = Price |> cleaner::as.currency(currency_symbol = "$", as_symbol = TRUE) |> format(currency_symbol = "$", as_symbol = TRUE),
         across(all_of(c("Planting Density (ea. per ft2)", "Each per Tray")), function(x) {format(x) |> stringr::str_remove("[:punct:]0*$")}))
-    },spacing = "s")
+    },spacing = "xs", align = 'c')
 
-  # "4 ft by 3 ft" |> str_to_lower() |> str_replace_all("x|(by)|(times)","*") |> str_remove_all("(?<=[:digit:][:space:]?)ft") |> rlang::parse_expr() |> eval()
-  # "2x8" |> str_remove_all("(?<=[:digit:])[:space:]?(sq)?ft\\^?2?") |> rlang::parse_expr()|>try() |> eval() |> is.numeric()
-  # "98 sqft^2" |> str_remove_all("(?<=[:digit:])[:space:]?(sq)?ft\\^?2?") |> rlang::parse_expr() |> eval()
 
   output$estTable <- renderTable({
 
-    # TODO add handeling for "feet" and "\'"
     # calculate area if given dimentions
     input$dimentions |> str_squish() |> req()
     area <- input$dimentions |> parse_area()
@@ -173,9 +170,9 @@ server <- function(input, output) {
       tidyr::pivot_longer(!Annuals) |>
       tidyr::pivot_wider(names_from = Annuals) |>
       tibble::column_to_rownames("name")
-  },spacing = "l", rownames = TRUE)
+  },spacing = "l", rownames = TRUE, hover = TRUE, align = 'c', caption = "This tool is provided to help choose between product options and is for estimation purposes only.")
 
-    output$disclaimer <- renderText({"This tool is provided to help choose between product options and is for estimation purposes only."})
+    # output$disclaimer <- renderText({"This tool is provided to help choose between product options and is for estimation purposes only."})
 }
 
 # Run the application
