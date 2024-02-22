@@ -67,18 +67,19 @@ str_correct_pi <- function(s) {
   m <- s |> str_extract(p)
   l <- str_length(m)
   if (!isTruthy(m)) s
-  else if(m |> str_equal(str_trunc(pi, l, ellipsis = ""))) str_replace_all(s, p,"pi")
-  else if(m |> str_equal(format(pi, TRUE, l-1, scientific = FALSE))) str_replace_all(s, p,"pi")
+  else if(m |> str_equal(str_trunc(pi, l, ellipsis = ""))) str_replace_all(s, p," pi ")
+  else if(m |> str_equal(format(pi, TRUE, l-1, scientific = FALSE))) str_replace_all(s, p," pi ")
   else s
 }
 
 # A user entry parsing function
 parse_area <- function(s) {
   if (is.numeric(s)) {s}
-  else if (s |> str_strip_sqft() |> rlang::parse_expr() |>try()  |> eval() |> is.numeric()) {
-    s |> str_strip_sqft() |> rlang::parse_expr() |> eval()
-  } else {
-    s |> str_strip_ft() |> str_correct_multiply() |> str_correct_pi() |> rlang::parse_expr() |> eval()
+  # else if (s |> str_strip_sqft() |> rlang::parse_expr() |> try()  |> eval() |> is.numeric()) {
+  #   s |> str_strip_sqft() |> rlang::parse_expr() |> eval()
+  # }
+  else {
+    s |> str_strip_sqft() |> str_strip_ft() |> str_correct_multiply() |> str_correct_pi() |> rlang::parse_expr() |> eval()
   }
 }
 
