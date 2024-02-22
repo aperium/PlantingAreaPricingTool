@@ -124,6 +124,7 @@ ui <- fluidPage( theme = bslib::bs_theme(bootswatch = "lumen") |> bslib::bs_add_
           # textOutput("disclaimer")
         )
     ),
+  tags$hr(),
   tags$h3("Unit Prices and Recommended Planting Densities"),
   tableOutput("refData")
 )
