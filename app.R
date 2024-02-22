@@ -98,13 +98,10 @@ ui <- fluidPage( theme = bslib::bs_theme(bootswatch = "lumen") |> bslib::bs_add_
     # input
     sidebarLayout(
         sidebarPanel(
-            # numericInput("area",
-            #             "Enter your bed area in sqft",
-            #             min = 0,
-            #             value = ""),
-          textInput("uid",
-                    "Enter your business account number"),
-          actionButton("uidSubmit","Submit"),
+
+          # textInput("uid",
+          #           "Enter your business account number"),
+          # actionButton("uidSubmit","Submit"),
             textInput("dimentions",
                       "Enter your bed area (sqft) or dimentions (ft)"),
             # selectInput("units",
@@ -149,7 +146,7 @@ server <- function(input, output) {
       dplyr::mutate(
         Price = Price |> cleaner::as.currency(currency_symbol = "$", as_symbol = TRUE) |> format(currency_symbol = "$", as_symbol = TRUE),
         across(all_of(c("Planting Density (ea. per ft2)", "Each per Tray")), function(x) {format(x) |> stringr::str_remove("[:punct:]0*$")}))
-    },spacing = "xs", align = 'c', html.table.attributes = "style=\"max-width:700px;margin-left:auto;margin-right:auto%;table-layout:auto;\"")
+    },spacing = "xs", align = 'c', html.table.attributes = "style=\"max-width:700px;margin-left:auto;margin-right:auto;table-layout:auto;\"")
 
 
   output$estTable <- renderTable({
