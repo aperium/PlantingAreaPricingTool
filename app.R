@@ -38,7 +38,7 @@ str_strip_sqft <- function(s) {
     str_squish() |>
     str_to_lower() |>
     str_remove("^[:space:]*=") |>
-    str_remove_all("(?<=[:digit:])[:space:]?(sq)?ft(\\^?2)?|(sq)?")
+    str_remove_all("(?<=[:digit:])[:space:]?(sq)?f(ee)?t(\\^?2)?|(sq)?")
 }
 
 # A user entry parsing support function
@@ -47,7 +47,7 @@ str_strip_ft <- function(s) {
     str_squish() |>
     str_to_lower() |>
     str_remove("^[:space:]*=") |>
-    str_remove_all("(?<=[:digit:][:space:]?)ft")
+    str_remove_all("(?<=[:digit:][:space:]?)((f(ee)?t)|('))")
 }
 
 # A user entry parsing support function
