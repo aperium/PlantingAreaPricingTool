@@ -58,6 +58,20 @@ str_correct_multiply <- function(s) {
     str_replace_all("x|(by)|(times)","*")
 }
 
+# A user entry parsing support function
+str_correct_pi <- function(s) {
+  str <- s |>
+    str_squish() |>
+    str_to_lower()
+  p <- "(?<![:digit:])3.14[:digit:]*"
+  m <- s |> str_extract(p)
+  if(m |> str_equal(str_trunc(pi, str_length(m), ellipsis = ""))) str_replace_all(p,"pi")
+  else if(m |> str_equal(format(pi, TRUE, str_length(m)-1, scientific = FALSE))) str_replace_all(p,"pi")
+  else s
+}
+
+str_correct_pi("3.145")
+
 # A user entry parsing function
 parse_area <- function(s) {
   if (is.numeric(s)) {s}
@@ -135,12 +149,7 @@ server <- function(input, output) {
     # TODO add handeling for "feet" and "\'"
     # calculate area if given dimentions
     input$dimentions |> str_squish() |> req()
-    area <- if (is.numeric(input$dimentions)) {input$dimentions}
-      else if (input$dimentions |> str_to_lower() |> str_remove("^[:space:]*=") |> str_remove_all("(?<=[:digit:])[:space:]?(sq)?ft(\\^?2)?|(sq)?") |> rlang::parse_expr() |>try()  |> eval() |> is.numeric()) {
-        input$dimentions |> str_to_lower() |> str_remove("^[:space:]*=") |> str_remove_all("(?<=[:digit:])[:space:]?(sq)?ft(\\^?2)?|(sq)?") |> rlang::parse_expr() |> eval()
-        } else {
-        input$dimentions |> str_to_lower() |> str_remove("^[:space:]*=") |> str_replace_all("x|(by)|(times)","*") |> str_remove_all("(?<=[:digit:][:space:]?)ft") |> rlang::parse_expr() |> eval()
-        }
+    area <- input$dimentions |> parse_area()
 
     data |>
       dplyr::filter(Annuals %in% input$products) |>
