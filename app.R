@@ -66,7 +66,7 @@ str_correct_pi <- function(s) {
   p <- "(?<![:digit:])3.14[:digit:]*"
   m <- s |> str_extract(p)
   l <- str_length(m)
-  if (l < 4) s
+  if (!isTruthy(m)) s
   else if(m |> str_equal(str_trunc(pi, l, ellipsis = ""))) str_replace_all(s, p,"pi")
   else if(m |> str_equal(format(pi, TRUE, l-1, scientific = FALSE))) str_replace_all(s, p,"pi")
   else s
