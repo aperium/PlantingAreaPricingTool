@@ -120,6 +120,7 @@ ui <- fluidPage( theme = bslib::bs_theme(bootswatch = "lumen") |> bslib::bs_add_
 
         # Show a plot of the generated distribution
         mainPanel(
+          uiOutput("estTitle", container = tags$h3),
           tableOutput("estTable"),
           # textOutput("disclaimer")
         )
@@ -153,6 +154,7 @@ server <- function(input, output) {
 
     # calculate area if given dimentions
     input$dimentions |> str_squish() |> req()
+    input$products |> req()
     area <- input$dimentions |> parse_area()
 
     data |>
@@ -172,6 +174,12 @@ server <- function(input, output) {
       tidyr::pivot_wider(names_from = Annuals) |>
       tibble::column_to_rownames("name")
   },spacing = "l", rownames = TRUE, hover = TRUE, align = 'c', caption = "This tool is provided to help choose between product options and is for estimation purposes only.")
+
+  output$estTitle <- renderUI({
+    input$dimentions |> str_squish() |> req()
+    input$products |> req()
+    "Calculated Estimates"
+    })
 
     # output$disclaimer <- renderText({"This tool is provided to help choose between product options and is for estimation purposes only."})
 }
