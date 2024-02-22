@@ -96,7 +96,7 @@ server <- function(input, output) {
 
   output$estTable <- renderTable({
 
-    # TODO ad handeling for "feet" and "\'"
+    # TODO add handeling for "feet" and "\'"
     # calculate area if given dimentions
     input$dimentions |> str_squish() |> req()
     area <- if (is.numeric(input$dimentions)) {input$dimentions}
