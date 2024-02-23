@@ -18,15 +18,16 @@ shinyOptions(shiny.sanitize.errors = FALSE,
 users_path <- "data/customers.xlsx"
 users <- users_path |>
   readxl::read_xlsx()
-#   dplyr::select(Annuals, `Each per Tray`, matches("Planting Density"), matches(paste0("Price", if_else(price_level %in% 1:6, paste0(".",price_level), "$")))) |>
-#   dplyr::rename(Price = matches("Price"))
+
 
 # Retrieve data
-price_level <- 0
+# price_level <- 0
 freight <- 0.07
 data_path <- "data/4and6inchPricesSp2024.xlsx"
-data <- data_path |>
-  readxl::read_xlsx()
+# data <- data_path |>
+#   readxl::read_xlsx()
+#   dplyr::select(Annuals, `Each per Tray`, matches("Planting Density"), matches(paste0("Price", if_else(price_level %in% 1:6, paste0(".",price_level), "$")))) |>
+#   dplyr::rename(Price = matches("Price"))
 
 # Retrieve Logo Image
 logo_height <- 60
@@ -114,19 +115,16 @@ ui <- fluidPage( theme = bslib::bs_theme(bootswatch = "lumen") |> bslib::bs_add_
                         "Select products to compare",
                         data$Annuals,
                         multiple = TRUE)
-
         ),
 
-
-
-        # Show a plot of the generated distribution
+        # Show output
         mainPanel(
           uiOutput("estTitle", container = tags$h3),
           tableOutput("estTable"),
         )
     ),
   tags$hr(),
-  tags$h3("Unit Prices and Recommended Planting Densities", style="text-align:center"),
+  uiOutput("refTitle", container = tags$h3, style="text-align:center"),
   tableOutput("refData"),
   tags$p("© 2024 Greenstreet Growers, Inc. 2024. All Rights Reserved.", style="text-align:center")
 )
@@ -144,45 +142,44 @@ server <- function(input, output) {
     }, deleteFile = FALSE)
 
   usr <- reactive({
+    # input$uid |> req()
     users |>
       slice(purrr::detect_index(CUST_NO,\(x) str_equal(x,input$uid |> str_squish(), ignore_case = TRUE)))
   })  |>
     bindEvent(input$uidSubmit)
 
+  price_level <- reactive({
+    usr()$PROF_COD_3 |> req()
+    usr()$PROF_COD_3 |>
+      switch(WHSLPRICE6 = 6)
+  })
 
-  # usr <- reactive({
-  #
-  #   # price_level <- usr$PROF_COD_3 |>
-  #   #   switch(WHSLPRICE6 = 6)
-  #   # data <- data |>
-  #   #   dplyr::select(Annuals, `Each per Tray`, matches("Planting Density"), matches(paste0("Price", if_else(price_level %in% 1:6, paste0(".",price_level), "$")))) |>
-  #   #   dplyr::rename(Price = matches("Price"))
-  #
-  #   # only proceed if there is a match
-  #   input$uid |> str_squish() |> str_to_upper() %in% users$CUST_NO |> req()
-  #
-  #   # pull values from users lookup table
-  #   usr <- users |>
-  #     slice(purrr::detect_index(CUST_NO,\(x) str_equal(x,input$uid |> str_squish(), ignore_case = TRUE)))
-  #   # price_level <- usr$PROF_COD_3 |> switch(WHSLPRICE6 = 6)
-  #
-  # }) |>
-  #   bindEvent(input$uidSubmit)
+  data <- reactive({
+    price_level() |> req()
+    data_path |>
+      readxl::read_xlsx() |>
+      dplyr::select(Annuals, `Each per Tray`, matches("Planting Density"), matches(paste0("Price", if_else(price_level() %in% 1:6, paste0(".",price_level()), "$")))) |>
+      dplyr::rename(Price = matches("Price"))
 
+  })
 
   output$uidText <- renderText({
     if(usr()$NAM_UPR |> isTruthy()) paste0("Welcome, ", usr()$NAM_UPR |> str_to_title(), "!")
     else paste("Account number",input$uid,"not found.")
-    }) |> bindEvent(input$uidSubmit)
+  }) |> bindEvent(input$uidSubmit)
 
-  output$refData <- renderTable({
-    data |> req()
-    data |>
+    output$refData <- renderTable({
+    data() |> req()
+    data() |>
       dplyr::mutate(
         Price = Price |> cleaner::as.currency(currency_symbol = "$", as_symbol = TRUE) |> format(currency_symbol = "$", as_symbol = TRUE),
         across(all_of(c("Planting Density (ea. per ft2)", "Each per Tray")), function(x) {format(x) |> stringr::str_remove("[:punct:]0*$")}))
     },spacing = "xs", align = 'c', html.table.attributes = "style=\"max-width:700px;margin-left:auto;margin-right:auto;table-layout:auto;\"")
 
+    output$refTitle <- renderUI({
+      data() |> req()
+      "Unit Prices and Recommended Planting Densities"
+    })
 
   output$estTable <- renderTable({
 
@@ -191,7 +188,8 @@ server <- function(input, output) {
     input$products |> req()
     area <- input$dimentions |> parse_area()
 
-    data |>
+    data() |> req()
+    data() |>
       dplyr::filter(Annuals %in% input$products) |>
       dplyr::mutate("Units (ea) Required" = area * `Planting Density (ea. per ft2)`,
              "Units Rounded up to Full Tray" =  (plyr::round_any(plyr::round_any(`Units (ea) Required`,1) / `Each per Tray`,1,ceiling) * `Each per Tray`) |> as.integer(),
@@ -212,6 +210,7 @@ server <- function(input, output) {
   output$estTitle <- renderUI({
     input$dimentions |> str_squish() |> req()
     input$products |> req()
+    data() |> req()
     "Calculated Estimates"
     })
 
