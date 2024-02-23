@@ -152,6 +152,7 @@ server <- function(input, output) {
       slice(purrr::detect_index(CUST_NO,function(x) str_equal(x,input$uid |> str_squish(), ignore_case = TRUE)))
     usr |> paste()
 
+
     }) |>
     bindEvent(input$uidSubmit)
 
