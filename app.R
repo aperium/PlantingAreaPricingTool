@@ -66,7 +66,7 @@ str_correct_pi <- function(s) {
   s <- s |>
     str_squish() |>
     str_to_lower()
-  p <- "((π)|(?<![:digit:])3.14[:digit:]*)"
+  p <- "(([π])|(?<![:digit:])3.14[:digit:]*)"
   m <- s |> str_extract(p)
   l <- str_length(m)
   if (!isTruthy(m)) s
@@ -111,9 +111,9 @@ ui <- fluidPage( theme = bslib::bs_theme(bootswatch = "lumen") |> bslib::bs_add_
           tags$hr(),
             textInput("dimentions",
                       "Enter your bed area (sqft) or dimentions (ft)"),
-          helpText("area of a rectangle = length × width",tags$br(),
-                   "area of a triangle = 1/2 base × height",tags$br(),
-                   "area of a circle = π × radius^2"),
+          helpText("area of a rectangle ◻ = length × width",tags$br(),
+                   "area of a triangle ◺ = 1/2 base × height",tags$br(),
+                   "area of a circle ○ = π × radius^2"),
             # selectInput("units",
             #             "Choose area units",
             #             measurements::conv_unit_options$area,
