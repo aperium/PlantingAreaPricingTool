@@ -99,9 +99,11 @@ ui <- fluidPage( theme = bslib::bs_theme(bootswatch = "lumen") |> bslib::bs_add_
     sidebarLayout(
         sidebarPanel(
 
-          # textInput("uid",
-          #           "Enter your business account number"),
-          # actionButton("uidSubmit","Submit"),
+          textInput("uid",
+                    "Enter your business account number"),
+          actionButton("uidSubmit","Submit"),
+          textOutput("uidText"),
+          tags$hr(),
             textInput("dimentions",
                       "Enter your bed area (sqft) or dimentions (ft)"),
             # selectInput("units",
@@ -140,6 +142,18 @@ server <- function(input, output) {
          alt="Greenstreet Growers Logo",
          height = logo_height)
     }, deleteFile = FALSE)
+
+  output$uidText <- renderText({
+    # only proceed if there is a match
+    input$uid |> str_squish() |> str_to_upper() %in% users$CUST_NO |> req()
+
+    # pull values from users lookup table
+    usr <- users |>
+      slice(purrr::detect_index(CUST_NO,function(x) str_equal(x,input$uid |> str_squish(), ignore_case = TRUE)))
+    usr |> paste()
+
+    }) |>
+    bindEvent(input$uidSubmit)
 
   output$refData <- renderTable({
     data |>
