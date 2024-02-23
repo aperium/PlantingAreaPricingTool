@@ -129,7 +129,7 @@ ui <- fluidPage( theme = bslib::bs_theme(bootswatch = "lumen") |> bslib::bs_add_
   tags$hr(),
   uiOutput("refTitle", container = tags$h3, style="text-align:center"),
   tableOutput("refData"),
-  tags$p("© 2024 Greenstreet Growers, Inc. 2024. All Rights Reserved.", style="text-align:center")
+  tags$p("© 2024 Greenstreet Growers, Inc. All Rights Reserved.", style="text-align:center")
 )
 
 
