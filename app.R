@@ -22,7 +22,7 @@ users <- users_path |>
 
 # Retrieve data
 # price_level <- 0
-freight <- 0.07
+# freight <- 0.07
 data_path <- "data/4and6inchPricesSp2024.xlsx"
 # data <- data_path |>
 #   readxl::read_xlsx()
@@ -102,14 +102,18 @@ ui <- fluidPage( theme = bslib::bs_theme(bootswatch = "lumen") |> bslib::bs_add_
     # input
     sidebarLayout(
         sidebarPanel(
-
-          textInput("uid",
-                    "Enter your business account number"),
-          actionButton("uidSubmit","Submit"),
+          fluidRow(
+            textInput("uid", "Enter your business account number"),
+            actionButton("uidSubmit","Submit", width = 'fit-content')
+            ),
           textOutput("uidText"),
           tags$hr(),
             textInput("dimentions",
                       "Enter your bed area (sqft) or dimentions (ft)"),
+          helpText(paste("area of a rectangle = $length x width$",
+                         "area of a triangle = 1/2 base x height",
+                         "area of a circle = pi x radius^2",
+                         sep = tags$br() |> paste())),
             # selectInput("units",
             #             "Choose area units",
             #             measurements::conv_unit_options$area,
@@ -157,6 +161,11 @@ server <- function(input, output) {
       switch(WHSLPRICE6 = 6)
   })
 
+  freight <- reactive({
+    usr()$FREIGHT |> req()
+    usr()$FREIGHT |> as.numeric()
+  })
+
   data <- reactive({
     price_level() |> req()
     data_path |>
@@ -197,16 +206,17 @@ server <- function(input, output) {
       dplyr::mutate("Units (ea) Required" = area * `Planting Density (ea. per ft2)`,
              "Units Rounded up to Full Tray" =  (plyr::round_any(plyr::round_any(`Units (ea) Required`,1) / `Each per Tray`,1,ceiling) * `Each per Tray`) |> as.integer(),
              "Price Estimate per Full Tray" = `Units Rounded up to Full Tray` * Price,
-             "Estimated Freight (7%)" = `Price Estimate per Full Tray` * freight,
-             "Estimated Total" = `Price Estimate per Full Tray` + `Estimated Freight (7%)`) |>
+             "Estimated Freight" = `Price Estimate per Full Tray` * freight(),
+             "Estimated Total" = `Price Estimate per Full Tray` + `Estimated Freight`) |>
       dplyr::mutate(across(all_of(c("Units (ea) Required","Units Rounded up to Full Tray")), function(x) {format(x) |> stringr::str_remove("[:punct:]0*$")}),
-                    across(all_of(c("Price Estimate per Full Tray","Estimated Freight (7%)","Estimated Total")),
+                    across(all_of(c("Price Estimate per Full Tray","Estimated Freight","Estimated Total")),
                       function(x) {x |>
                           cleaner::as.currency(currency_symbol = "$", as_symbol = TRUE) |>
                           format(currency_symbol = "$", as_symbol = TRUE)})) |>
       dplyr::select(!c(`Each per Tray`, matches("Planting Density"), Price)) |>
       tidyr::pivot_longer(!Annuals) |>
       tidyr::pivot_wider(names_from = Annuals) |>
+      mutate(name = if_else(str_equal(name,"Estimated Freight"),paste0(name," (",freight() |> scales::percent(),")"),name)) |>
       tibble::column_to_rownames("name")
   },spacing = "l", rownames = TRUE, hover = TRUE, align = 'c', caption = "This tool is provided to help choose between product options and is for estimation purposes only.")
 
