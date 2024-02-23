@@ -171,9 +171,9 @@ server <- function(input, output) {
 
 
   output$uidText <- renderText({
-    usr()$NAM_UPR |> str_to_title()
-
-    })
+    if(usr()$NAM_UPR |> isTruthy()) paste0("Welcome, ", usr()$NAM_UPR |> str_to_title(), "!")
+    else paste("Account number",input$uid,"not found.")
+    }) |> bindEvent(input$uidSubmit)
 
   output$refData <- renderTable({
     data |> req()
