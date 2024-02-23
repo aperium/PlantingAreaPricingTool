@@ -58,7 +58,7 @@ str_correct_multiply <- function(s) {
   s |>
     str_squish() |>
     str_to_lower() |>
-    str_replace_all("x|(by)|(times)","*")
+    str_replace_all("x|(by)|(times)|×","*")
 }
 
 # A user entry parsing support function
@@ -110,9 +110,9 @@ ui <- fluidPage( theme = bslib::bs_theme(bootswatch = "lumen") |> bslib::bs_add_
           tags$hr(),
             textInput("dimentions",
                       "Enter your bed area (sqft) or dimentions (ft)"),
-          helpText("area of a rectangle = length x width",tags$br(),
-                   "area of a triangle = 1/2 base x height",tags$br(),
-                   "area of a circle = pi x radius^2"),
+          helpText("area of a rectangle = length × width",tags$br(),
+                   "area of a triangle = 1/2 base × height",tags$br(),
+                   "area of a circle = pi × radius^2"),
             # selectInput("units",
             #             "Choose area units",
             #             measurements::conv_unit_options$area,
