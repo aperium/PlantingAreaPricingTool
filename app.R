@@ -150,7 +150,7 @@ server <- function(input, output) {
     # pull values from users lookup table
     usr <- users |>
       slice(purrr::detect_index(CUST_NO,function(x) str_equal(x,input$uid |> str_squish(), ignore_case = TRUE)))
-    usr$NAM_UPR
+    usr$NAM_UPR |> str_to_title()
 
 
     }) |>
