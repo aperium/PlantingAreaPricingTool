@@ -7,6 +7,7 @@ All information is provided without any promise or accuracy stated or implied.
 ## Planned Improvements
 
 - [x] accept more flexible freestyle input units including `feet` & `'`.
+- [x] require account number to reveal customer-specific pricing.
 - [ ] Allow users to use custom planting densities for each product type
 - [ ] Help users with beds of different shapes.
   - [ ] either a help box with formulas for the areas of different shapes or a selector for users to choose the shape of bed they have.
