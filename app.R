@@ -18,15 +18,15 @@ shinyOptions(shiny.sanitize.errors = FALSE,
 users_path <- "data/customers.xlsx"
 users <- users_path |>
   readxl::read_xlsx()
+#   dplyr::select(Annuals, `Each per Tray`, matches("Planting Density"), matches(paste0("Price", if_else(price_level %in% 1:6, paste0(".",price_level), "$")))) |>
+#   dplyr::rename(Price = matches("Price"))
 
 # Retrieve data
-price_level <- 6
+price_level <- 0
 freight <- 0.07
 data_path <- "data/4and6inchPricesSp2024.xlsx"
 data <- data_path |>
-  readxl::read_xlsx() |>
-  dplyr::select(Annuals, `Each per Tray`, matches("Planting Density"), matches(paste0("Price", if_else(price_level %in% 1:6, paste0(".",price_level), "$")))) |>
-  dplyr::rename(Price = matches("Price"))
+  readxl::read_xlsx()
 
 # Retrieve Logo Image
 logo_height <- 60
@@ -143,19 +143,40 @@ server <- function(input, output) {
          height = logo_height)
     }, deleteFile = FALSE)
 
-  output$uidText <- renderText({
-    # only proceed if there is a match
-    input$uid |> str_squish() |> str_to_upper() %in% users$CUST_NO |> req()
-
-    # pull values from users lookup table
-    usr <- users |>
+  usr <- reactive({
+    users |>
       slice(purrr::detect_index(CUST_NO,\(x) str_equal(x,input$uid |> str_squish(), ignore_case = TRUE)))
-    price_level <- usr$PROF_COD_3 |> switch(WHSLPRICE6 = 6)
-    usr$NAM_UPR |> str_to_title() |> paste(price_level)
-    }) |>
+  })  |>
     bindEvent(input$uidSubmit)
 
+
+  # usr <- reactive({
+  #
+  #   # price_level <- usr$PROF_COD_3 |>
+  #   #   switch(WHSLPRICE6 = 6)
+  #   # data <- data |>
+  #   #   dplyr::select(Annuals, `Each per Tray`, matches("Planting Density"), matches(paste0("Price", if_else(price_level %in% 1:6, paste0(".",price_level), "$")))) |>
+  #   #   dplyr::rename(Price = matches("Price"))
+  #
+  #   # only proceed if there is a match
+  #   input$uid |> str_squish() |> str_to_upper() %in% users$CUST_NO |> req()
+  #
+  #   # pull values from users lookup table
+  #   usr <- users |>
+  #     slice(purrr::detect_index(CUST_NO,\(x) str_equal(x,input$uid |> str_squish(), ignore_case = TRUE)))
+  #   # price_level <- usr$PROF_COD_3 |> switch(WHSLPRICE6 = 6)
+  #
+  # }) |>
+  #   bindEvent(input$uidSubmit)
+
+
+  output$uidText <- renderText({
+    usr()$NAM_UPR |> str_to_title()
+
+    })
+
   output$refData <- renderTable({
+    data |> req()
     data |>
       dplyr::mutate(
         Price = Price |> cleaner::as.currency(currency_symbol = "$", as_symbol = TRUE) |> format(currency_symbol = "$", as_symbol = TRUE),
