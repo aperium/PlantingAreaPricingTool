@@ -149,10 +149,9 @@ server <- function(input, output) {
 
     # pull values from users lookup table
     usr <- users |>
-      slice(purrr::detect_index(CUST_NO,function(x) str_equal(x,input$uid |> str_squish(), ignore_case = TRUE)))
-    usr$NAM_UPR |> str_to_title()
-
-
+      slice(purrr::detect_index(CUST_NO,\(x) str_equal(x,input$uid |> str_squish(), ignore_case = TRUE)))
+    price_level <- usr$PROF_COD_3 |> switch(WHSLPRICE6 = 6)
+    usr$NAM_UPR |> str_to_title() |> paste(price_level)
     }) |>
     bindEvent(input$uidSubmit)
 
