@@ -122,10 +122,11 @@ ui <- fluidPage( theme = bslib::bs_theme(bootswatch = "lumen") |> bslib::bs_add_
             #             "Choose area units",
             #             measurements::conv_unit_options$area,
             #             selected = "ft2"),
-            selectInput("products",
-                        "Select products to compare",
-                        data$Annuals,
-                        multiple = TRUE)
+            # selectInput(inputId = "products",
+            #             label = "Select products to compare",
+            #             choices = data()$Annuals,
+            #             multiple = TRUE)
+          uiOutput("productOptions")
         ),
 
         # Show output
@@ -186,10 +187,15 @@ server <- function(input, output) {
       dplyr::select(Annuals, `Each per Tray`, matches("Planting Density"), matches(paste0("Price", if_else(price_level() %in% 1:6, paste0(".",price_level()), "$")))) |>
       dplyr::rename(Price = matches("Price")) |>
       full_join(special_pricing_data |> filter(str_equal(`Customer Number`,usr()$CUST_NO, ignore_case = TRUE)) |> select(-"Customer Number"))
-
-
   })
 
+  output$productOptions <- renderUI({
+    usr()$CUST_NO |> req()
+    selectInput(inputId = "products",
+                label = "Select products to compare",
+                choices = data()$Annuals,
+                multiple = TRUE)
+  })
 
   output$uidText <- renderText({
     if(usr()$NAM |> isTruthy()) paste0("Welcome, ", usr()$NAM, "!")
@@ -202,7 +208,7 @@ server <- function(input, output) {
       dplyr::mutate(
         Price = Price |> cleaner::as.currency(currency_symbol = "$", as_symbol = TRUE) |> format(currency_symbol = "$", as_symbol = TRUE),
         across(all_of(c("Planting Density (ea. per ft2)", "Each per Tray")), function(x) {format(x) |> stringr::str_remove("[:punct:]0*$")}))
-    },spacing = "xs", align = 'c', html.table.attributes = "style=\"max-width:700px;margin-left:auto;margin-right:auto;table-layout:auto;\"")
+    },spacing = "xs", align = 'c', html.table.attributes = "style=\"max-width:800px;margin-left:auto;margin-right:auto;table-layout:auto;\"")
 
     output$refTitle <- renderUI({
       data() |> req()
