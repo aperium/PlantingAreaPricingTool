@@ -14,11 +14,15 @@ sapply(pacs, require, character = TRUE)
 shinyOptions(shiny.sanitize.errors = FALSE,
              shiny.suppressMissingContextError = TRUE)
 
-# Retrieve users
-users_path <- "data/customers.xlsx"
-users <- users_path |>
+# Retrieve Freight Rates
+freight_path <- "data/freight.xlsx"
+freight_data <- freight_path |>
   readxl::read_xlsx()
 
+# Retrieve users
+users_path <- "data/Client.xlsx"
+users <- users_path |>
+  readxl::read_xlsx()
 
 # Retrieve data
 # price_level <- 0
@@ -158,12 +162,20 @@ server <- function(input, output) {
   price_level <- reactive({
     usr()$PROF_COD_3 |> req()
     usr()$PROF_COD_3 |>
-      switch(WHSLPRICE6 = 6)
+      switch(WHSLPRICE6 = 6,
+             WHSLPRICE5 = 5,
+             WHSLPRICE4 = 4,
+             WHSLPRICE3 = 3,
+             WHSLPRICE2 = 2,
+             WHSLPRICE1 = 1)
   })
 
   freight <- reactive({
-    usr()$FREIGHT |> req()
-    usr()$FREIGHT |> as.numeric()
+    usr()$CUST_NO |> req()
+    price_level() |> req()
+    i <- freight_data$account_number |> purrr::detect_index(\(x) {str_equal(x,usr()$CUST_NO, ignore_case = TRUE) |> isTruthy()})
+    if (i <= 0) i <- freight_data$price_level |> purrr::detect_index(\(x) {magrittr::equals(x,price_level()) |> isTruthy()})
+    slice(freight_data, i)$freight_rate
   })
 
   data <- reactive({
@@ -176,7 +188,7 @@ server <- function(input, output) {
   })
 
   output$uidText <- renderText({
-    if(usr()$NAM_UPR |> isTruthy()) paste0("Welcome, ", usr()$NAM_UPR |> str_to_title(), "!")
+    if(usr()$NAM |> isTruthy()) paste0("Welcome, ", usr()$NAM, "!")
     else paste("Account number",input$uid,"not found.")
   }) |> bindEvent(input$uidSubmit)
 
