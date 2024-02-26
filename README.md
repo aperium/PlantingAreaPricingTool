@@ -10,7 +10,8 @@ All information is provided without any promise or accuracy stated or implied.
 - [x] require account number to reveal customer-specific pricing.
 - [ ] Allow users to use custom planting densities for each product type
 - [ ] Help users with beds of different shapes.
-  - [ ] either a help box with formulas for the areas of different shapes or a selector for users to choose the shape of bed they have.
+  - [x] either a help box with formulas for the areas of different shapes or a selector for users to choose the shape of bed they have.
+  - [ ] Would still be nice to have a tool help.
   - [ ] Shapes of beds to include:
     - [ ] rectangle
     - [ ] triangle
