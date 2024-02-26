@@ -186,7 +186,8 @@ server <- function(input, output) {
       readxl::read_xlsx() |>
       dplyr::select(Annuals, `Each per Tray`, matches("Planting Density"), matches(paste0("Price", if_else(price_level() %in% 1:6, paste0(".",price_level()), "$")))) |>
       dplyr::rename(Price = matches("Price")) |>
-      full_join(special_pricing_data |> filter(str_equal(`Customer Number`,usr()$CUST_NO, ignore_case = TRUE)) |> select(-"Customer Number"))
+      full_join(special_pricing_data |> filter(str_equal(`Customer Number`,usr()$CUST_NO, ignore_case = TRUE)) |> select(-"Customer Number")) |>
+      arrange(Price)
   })
 
   output$productOptions <- renderUI({
