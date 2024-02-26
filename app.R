@@ -162,20 +162,20 @@ server <- function(input, output) {
 
   price_level <- reactive({
     usr()$PROF_COD_3 |> req()
-    usr()$PROF_COD_3 |>
-      switch(WHSLPRICE6 = 6,
-             WHSLPRICE5 = 5,
-             WHSLPRICE4 = 4,
-             WHSLPRICE3 = 3,
-             WHSLPRICE2 = 2,
-             WHSLPRICE1 = 1)
+    usr()$PROF_COD_3 |> str_extract("(?<=^WHSLPRICE)[123456]$")
+      # switch(WHSLPRICE6 = 6,
+      #        WHSLPRICE5 = 5,
+      #        WHSLPRICE4 = 4,
+      #        WHSLPRICE3 = 3,
+      #        WHSLPRICE2 = 2,
+      #        WHSLPRICE1 = 1)
   })
 
   freight <- reactive({
     usr()$CUST_NO |> req()
-    price_level() |> req()
     i <- freight_data$account_number |> purrr::detect_index(\(x) {str_equal(x,usr()$CUST_NO, ignore_case = TRUE) |> isTruthy()})
-    if (i <= 0) i <- freight_data$price_level |> purrr::detect_index(\(x) {magrittr::equals(x,price_level()) |> isTruthy()})
+    if (i <= 0) i <- freight_data$account_pattern |> purrr::detect_index(\(x) {str_detect(usr()$NAM |> str_to_title(), x |> str_to_title()) |> isTruthy()})
+    if (i <= 0) i <- freight_data$freight_rate |> purrr::detect_index(\(x) {x == max(freight_data$freight_rate)})
     slice(freight_data, i)$freight_rate
   })
 
@@ -184,9 +184,9 @@ server <- function(input, output) {
     usr()$CUST_NO |> req()
     data_path |>
       readxl::read_xlsx() |>
-      dplyr::select(Annuals, `Each per Tray`, matches("Planting Density"), matches(paste0("Price", if_else(price_level() %in% 1:6, paste0(".",price_level()), "$")))) |>
+      dplyr::select(Annuals, `Each per Tray`, matches("Planting Density"), matches(paste0("((Price).*(",format(price_level()),"))|(\2.*\1)"))) |>
       dplyr::rename(Price = matches("Price")) |>
-      full_join(special_pricing_data |> filter(str_detect(usr()$NAM, `Customer Name`)) |> select(-"Customer Name")) |>
+      full_join(special_pricing_data |> filter(str_detect(usr()$NAM |> str_to_title(), `Customer Name` |> str_to_title())) |> select(-"Customer Name")) |>
       summarise(Price = min(Price), .by = !c("Price")) |>
       arrange(Price)
   })
@@ -224,6 +224,7 @@ server <- function(input, output) {
     input$products |> req()
     area <- input$dimentions |> parse_area()
 
+    freight() |> req()
     data() |> req()
     data() |>
       dplyr::filter(Annuals %in% input$products) |>
