@@ -25,13 +25,13 @@ users <- users_path |>
   readxl::read_xlsx()
 
 # Retrieve data
-# price_level <- 0
-# freight <- 0.07
 data_path <- "data/4and6inchPricesSp2024.xlsx"
 # data <- data_path |>
 #   readxl::read_xlsx()
-#   dplyr::select(Annuals, `Each per Tray`, matches("Planting Density"), matches(paste0("Price", if_else(price_level %in% 1:6, paste0(".",price_level), "$")))) |>
-#   dplyr::rename(Price = matches("Price"))
+
+# Retrieve special pricing data
+special_pricing_data <- "data/special_prices.xlsx" |>
+  readxl::read_xlsx()
 
 # Retrieve Logo Image
 logo_height <- 60
@@ -180,12 +180,16 @@ server <- function(input, output) {
 
   data <- reactive({
     price_level() |> req()
+    usr()$CUST_NO |> req()
     data_path |>
       readxl::read_xlsx() |>
       dplyr::select(Annuals, `Each per Tray`, matches("Planting Density"), matches(paste0("Price", if_else(price_level() %in% 1:6, paste0(".",price_level()), "$")))) |>
-      dplyr::rename(Price = matches("Price"))
+      dplyr::rename(Price = matches("Price")) |>
+      full_join(special_pricing_data |> filter(str_equal(`Customer Number`,usr()$CUST_NO, ignore_case = TRUE)) |> select(-"Customer Number"))
+
 
   })
+
 
   output$uidText <- renderText({
     if(usr()$NAM |> isTruthy()) paste0("Welcome, ", usr()$NAM, "!")
