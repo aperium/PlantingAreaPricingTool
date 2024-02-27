@@ -117,7 +117,7 @@ ui <- fluidPage( theme = bslib::bs_theme(bootswatch = "lumen") |> bslib::bs_add_
                       "Enter your bed area (sqft) or dimentions (ft)"),
           helpText("area of a rectangle ◻ = length × width",tags$br(),
                    "area of a triangle ◺ = 1/2 base × height",tags$br(),
-                   "area of a circle ○ = π × radius^2"),
+                   "area of a circle ○ = 3.14 × center to edge × center to edge"),
             # selectInput("units",
             #             "Choose area units",
             #             measurements::conv_unit_options$area,
