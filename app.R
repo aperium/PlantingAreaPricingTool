@@ -186,8 +186,9 @@ server <- function(input, output) {
       readxl::read_xlsx() |>
       dplyr::select(Annuals, `Each per Tray`, matches("Planting Density"), matches(paste0("((Price).*(",format(price_level()),"))|(\2.*\1)"))) |>
       dplyr::rename(Price = matches("Price")) |>
-      full_join(special_pricing_data |> filter(str_detect(usr()$NAM |> str_to_title(), `Customer Name` |> str_to_title())) |> select(-"Customer Name")) |>
-      summarise(Price = min(Price), .by = !c("Price")) |>
+      # full_join(special_pricing_data |> filter(str_detect(usr()$NAM |> str_to_title(), `Customer Name` |> str_to_title())) |> select(-"Customer Name")) |>
+      dplyr::rows_upsert(special_pricing_data |> filter(str_detect(usr()$NAM |> str_to_title(), `Customer Name` |> str_to_title())) |> select(-"Customer Name"), by = "Annuals") |>
+      # summarise(Price = min(Price), .by = !c("Price")) |>
       arrange(Price)
   })
 
