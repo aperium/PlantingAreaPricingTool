@@ -17,3 +17,4 @@ All information is provided without any promise or accuracy stated or implied.
     - [ ] triangle
     - [ ] circle
     - [ ] (maybe also oval and half circle?)
+  - [ ] Add `plant spacing` as a column/option alongside `plant density`.
