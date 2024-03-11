@@ -81,7 +81,6 @@ str_correct_pi <- function(s) {
 }
 
 # A user entry parsing function
-# based on http://datagenetics.com/blog/june32014/index.html and http://hydra.nat.uni-magdeburg.de/packing/csq/csq.html
 parse_area <- function(s) {
   if (is.numeric(s)) {s}
   else {
@@ -96,8 +95,9 @@ parse_area <- function(s) {
 }
 
 # function for calculating density to spacing using packing models
-# (1.75 * pi/4/pi)^(1/2)*2
-# (1.75 * pi/6/pi*3^(1/2))^(1/2)*2
+# based on http://datagenetics.com/blog/june32014/index.html
+# can expand using optimal cirlce packing solutions as a table or perhaps fitted function http://hydra.nat.uni-magdeburg.de/packing/csq/csq.html
+# currently n does nothing.
 distance <- function(density, n=1, method = c("avg","hex","sqr")) {
   d_hex = pi/6*3^(1/2)
   d_sqr = pi/4
