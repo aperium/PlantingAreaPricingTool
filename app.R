@@ -81,6 +81,7 @@ str_correct_pi <- function(s) {
 }
 
 # A user entry parsing function
+# based on http://datagenetics.com/blog/june32014/index.html and http://hydra.nat.uni-magdeburg.de/packing/csq/csq.html
 parse_area <- function(s) {
   if (is.numeric(s)) {s}
   else {
@@ -92,6 +93,19 @@ parse_area <- function(s) {
       rlang::parse_expr() |>
       eval()
   }
+}
+
+# function for calculating density to spacing using packing models
+# (1.75 * pi/4/pi)^(1/2)*2
+# (1.75 * pi/6/pi*3^(1/2))^(1/2)*2
+distance <- function(density, n=1, method = c("avg","hex","sqr")) {
+  d_hex = pi/6*3^(1/2)
+  d_sqr = pi/4
+  d_calc = switch ("avg",
+    "avg" = (d_hex*d_sqr)^(1/2),
+    "hex" = d_hex,
+    "sqr" = d_sqr)
+  (d_calc/pi/density)^(1/2)*2
 }
 
 
@@ -189,8 +203,12 @@ server <- function(input, output) {
       # full_join(special_pricing_data |> filter(str_detect(usr()$NAM |> str_to_title(), `Customer Name` |> str_to_title())) |> select(-"Customer Name")) |>
       dplyr::rows_upsert(special_pricing_data |> filter(str_detect(usr()$NAM |> str_to_title(), `Customer Name` |> str_to_title())) |> select(-"Customer Name"), by = "Annuals") |>
       # summarise(Price = min(Price), .by = !c("Price")) |>
-      arrange(Price)
+      arrange(Price) |>
+      dplyr::mutate("Plant Spacing (in)" = `Planting Density (ea. per ft2)` |> distance() |> measurements::conv_unit("ft","in"), .after = `Planting Density (ea. per ft2)`)
   })
+
+
+
 
   output$productOptions <- renderUI({
     usr()$CUST_NO |> req()
