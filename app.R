@@ -257,7 +257,7 @@ server <- function(input, output) {
                       function(x) {x |>
                           cleaner::as.currency(currency_symbol = "$", as_symbol = TRUE) |>
                           format(currency_symbol = "$", as_symbol = TRUE)})) |>
-      dplyr::select(!c(`Each per Tray`, matches("Planting Density"), Price)) |>
+      dplyr::select(!c(`Each per Tray`, matches("Planting Density"), matches("Plant Spacing"), Price)) |>
       tidyr::pivot_longer(!Annuals) |>
       tidyr::pivot_wider(names_from = Annuals) |>
       mutate(name = if_else(str_equal(name,"Estimated Freight"),paste0(name," (",freight() |> scales::percent(),")"),name)) |>
