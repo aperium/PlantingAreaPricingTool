@@ -111,7 +111,10 @@ distance <- function(density, n=1, method = c("avg","hex","sqr")) {
 # UI Element for user to enter the area
 input_area <- textInput("dimentions",
                         "Enter your bed area (sqft) or dimentions (ft)")
-input_choose_shape <-
+input_choose_shape <- radioButtons("shape",
+                                   "What shape is the bed?",
+                                   choices = c("rectangle", "triangle", "cicle"),
+                                   inline = TRUE)
 
 
 
@@ -133,6 +136,7 @@ ui <- fluidPage( theme = bslib::bs_theme(bootswatch = "lumen") |> bslib::bs_add_
             ),
           textOutput("uidText"),
           tags$hr(),
+          input_choose_shape,
           input_area,
           helpText("area of a rectangle ◻ = length × width",tags$br(),
                    "area of a triangle ◺ = 1/2 base × height",tags$br(),
