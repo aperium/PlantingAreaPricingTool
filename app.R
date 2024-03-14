@@ -108,6 +108,12 @@ distance <- function(density, n=1, method = c("avg","hex","sqr")) {
   (d_calc/pi/density)^(1/2)*2
 }
 
+# UI Element for user to enter the area
+input_area <- textInput("dimentions",
+                        "Enter your bed area (sqft) or dimentions (ft)")
+input_choose_shape <-
+
+
 
 # Define UI for application
 ui <- fluidPage( theme = bslib::bs_theme(bootswatch = "lumen") |> bslib::bs_add_rules(".well { background-color: #ECECEC }"),
@@ -127,8 +133,7 @@ ui <- fluidPage( theme = bslib::bs_theme(bootswatch = "lumen") |> bslib::bs_add_
             ),
           textOutput("uidText"),
           tags$hr(),
-            textInput("dimentions",
-                      "Enter your bed area (sqft) or dimentions (ft)"),
+          input_area,
           helpText("area of a rectangle ◻ = length × width",tags$br(),
                    "area of a triangle ◺ = 1/2 base × height",tags$br(),
                    "area of a circle ○ = 3.14 × center to edge × center to edge"),

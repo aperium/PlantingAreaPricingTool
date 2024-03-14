@@ -17,4 +17,5 @@ All information is provided without any promise or accuracy stated or implied.
     - [ ] triangle
     - [ ] circle
     - [ ] (maybe also oval and half circle?)
-  - [ ] Add `plant spacing` as a column/option alongside `plant density`.
+- [x] Add `plant spacing` as a column/option alongside `plant density`.
+- [ ] Add user customer number to be passed in the URL. See `shiny::getQueryString()`
