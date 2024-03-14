@@ -110,7 +110,7 @@ distance <- function(density, n=1, method = c("avg","hex","sqr")) {
 
 # UI Element for user to enter the area
 input_area <- textInput("dimentions",
-                        "Enter your bed area (sqft) or dimentions (ft)")
+                        "Or enter your bed area (sqft) or dimentions (ft)")
 input_choose_shape <- radioButtons("shape",
                                    "What shape is the bed?",
                                    choices = c("rectangle", "triangle", "circle"),
@@ -139,8 +139,8 @@ ui <- fluidPage( theme = bslib::bs_theme(bootswatch = "lumen") |> bslib::bs_add_
           input_choose_shape,
           uiOutput("dimentionEntry"),
           input_area,
-          helpText("Modify your calculations using this box ↑",tags$br(),
-                   "For example, if there are two identical beds add \"×2\" at the end.",tags$br(),tags$br()),
+          helpText("Tip: Modify your calculations using this box ↑",tags$br(),
+                   "For example, if there are 2 identical beds type \"×2\" at the end.",tags$br(),tags$br()),
             # selectInput("units",
             #             "Choose area units",
             #             measurements::conv_unit_options$area,
@@ -229,8 +229,8 @@ server <- function(input, output) {
     input$shape |> req()
     switch (input$shape,
             "rectangle" = req(input$length>0, input$width>0),
-            "triangle" = req(input$base, input$height),
-            "circle" = req(input$diameter)
+            "triangle" = req(input$base>0, input$height>0),
+            "circle" = req(input$diameter>0)
     )
     switch (input$shape,
             "rectangle" = input$length * input$width,
