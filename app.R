@@ -229,7 +229,7 @@ server <- function(input, output) {
   dimentionCalcdArea <- reactive({
     input$shape |> req()
     switch (input$shape,
-            "rectangle" = req(input$length, input$width),
+            "rectangle" = req(input$length>0, input$width>0),
             "triangle" = req(input$base, input$height),
             "circle" = req(input$diameter)
     )
