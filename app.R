@@ -220,10 +220,30 @@ server <- function(input, output) {
   output$dimentionEntry <- renderUI({
     input$shape |> req()
     switch (input$shape,
-      "rectangle" = {fluidRow(numericInput("length","Rectangle length:",0,min=0,max =.Machine$double.xmax),numericInput("width","Rectangle width:",0,min=0,max =.Machine$double.xmax))},
-      "triangle" = {numericInput("base","Triangle Base length:",0,min=0,max =.Machine$double.xmax);numericInput("height","Triangle height:",0,min=0,max =.Machine$double.xmax)},
-      "circle" = {numericInput("diameter","Width of Circle:",0,min=0,max =.Machine$double.xmax)}
+      "rectangle" = {fluidRow(numericInput("length","Rectangle length (ft):",0,min=0,max =.Machine$double.xmax),numericInput("width","Rectangle width (ft):",0,min=0,max =.Machine$double.xmax))},
+      "triangle" = {fluidRow(numericInput("base","Triangle Base length (ft):",0,min=0,max =.Machine$double.xmax),numericInput("height","Triangle height (ft):",0,min=0,max =.Machine$double.xmax))},
+      "circle" = {numericInput("diameter","Circle width (ft):",0,min=0,max =.Machine$double.xmax)}
     )
+  })
+
+  dimentionCalcdArea <- reactive({
+    input$shape |> req()
+    switch (input$shape,
+            "rectangle" = req(input$length, input$width),
+            "triangle" = req(input$base, input$height),
+            "circle" = req(input$diameter)
+    )
+    switch (input$shape,
+            "rectangle" = input$length * input$width,
+            "triangle" = (input$base * input$height)/2,
+            "circle" = pi*(input$diameter/2)^2
+    )
+  })
+
+  observe({
+    updateTextInput(inputId = "dimentions",
+                    value = dimentionCalcdArea() |> paste("sqft"),
+                    label = "Your bed area in sqft (or enter your own area formula):")
   })
 
   output$productOptions <- renderUI({
