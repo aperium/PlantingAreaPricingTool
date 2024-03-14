@@ -113,7 +113,7 @@ input_area <- textInput("dimentions",
                         "Enter your bed area (sqft) or dimentions (ft)")
 input_choose_shape <- radioButtons("shape",
                                    "What shape is the bed?",
-                                   choices = c("rectangle", "triangle", "cicle"),
+                                   choices = c("rectangle", "triangle", "circle"),
                                    inline = TRUE)
 
 
@@ -137,6 +137,7 @@ ui <- fluidPage( theme = bslib::bs_theme(bootswatch = "lumen") |> bslib::bs_add_
           textOutput("uidText"),
           tags$hr(),
           input_choose_shape,
+          uiOutput("dimentionEntry"),
           input_area,
           helpText("area of a rectangle ◻ = length × width",tags$br(),
                    "area of a triangle ◺ = 1/2 base × height",tags$br(),
@@ -216,8 +217,14 @@ server <- function(input, output) {
       dplyr::mutate("Plant Spacing (in)" = `Planting Density (ea. per ft2)` |> distance() |> measurements::conv_unit("ft","in"), .after = `Planting Density (ea. per ft2)`)
   })
 
-
-
+  output$dimentionEntry <- renderUI({
+    input$shape |> req()
+    switch (input$shape,
+      "rectangle" = {fluidRow(numericInput("length","Rectangle length:",0,min=0,max =.Machine$double.xmax),numericInput("width","Rectangle width:",0,min=0,max =.Machine$double.xmax))},
+      "triangle" = {numericInput("base","Triangle Base length:",0,min=0,max =.Machine$double.xmax);numericInput("height","Triangle height:",0,min=0,max =.Machine$double.xmax)},
+      "circle" = {numericInput("diameter","Width of Circle:",0,min=0,max =.Machine$double.xmax)}
+    )
+  })
 
   output$productOptions <- renderUI({
     usr()$CUST_NO |> req()
