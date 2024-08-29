@@ -25,7 +25,7 @@ users <- users_path |>
   readxl::read_xlsx()
 
 # Retrieve data
-data_path <- "data/4and6inchPricesSp2024.xlsx"
+data_path <- "data/4and6inchPricesFa2024.xlsx"
 # data <- data_path |>
 #   readxl::read_xlsx()
 
